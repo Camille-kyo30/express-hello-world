@@ -18,7 +18,7 @@ app.post('/api/message', async (req, res) => {
     }
 
     try {
-        // Envoi du message à Gemini avec les instructions système intégrées
+        // Envoi du message à Gemini avec la bonne structure du SDK @google/genai
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: message,
@@ -27,7 +27,17 @@ app.post('/api/message', async (req, res) => {
             }
         });
 
-        const reponseIA = response.text || "[Mini 2.0]: Désolé, je n'ai pas pu générer de réponse.";
+        // 🔥 CORRECTION ICI : Extraction correcte du texte selon le nouveau SDK
+        let reponseIA = "";
+        if (response && response.text) {
+            reponseIA = response.text;
+        } else if (response && typeof response.text === 'function') {
+            reponseIA = await response.text();
+        } else if (response?.candidates?.[0]?.content?.parts?.[0]?.text) {
+            reponseIA = response.candidates[0].content.parts[0].text;
+        } else {
+            reponseIA = "Désolé, je n'ai pas pu générer de réponse.";
+        }
 
         return res.json({
             recipient: { id: senderId },
@@ -35,7 +45,9 @@ app.post('/api/message', async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Erreur Gemini API:", error);
+        // Cela te permettra de voir l'erreur exacte dans les logs Render (ex: Clé API invalide)
+        console.error("Erreur Gemini API détaillée:", error);
+        
         return res.json({
             recipient: { id: senderId },
             message: { text: "[Mini 2.0]: Une erreur est survenue lors de la génération de ma réponse." }
