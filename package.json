@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node app.js"
   },
-  "dependencies": {
-    "express": "^5.0.0"
+    "dependencies": {
+    "express": "^5.0.0",
+    "@google/genai": "^0.1.1"
   }
-}
