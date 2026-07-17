@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "express": "^5.0.0",
-    "@google/genai": "latest"
+    "@google/generative-ai": "^0.21.0"
   }
 }
